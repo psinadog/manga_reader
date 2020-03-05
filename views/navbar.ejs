@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="/stylesheets/navbar.css">
+<div>
+    <% if(data.is_login) { %>
+    <form action="/exit" method="post">
+        <input type="submit" name="exit" value="exit" class="exit">
+    </form>
+    <% } else { %>
+    <a href="/login">login</a>
+    <a href="/registration">registration</a>
+    <% } %>
+</div>
