@@ -1,5 +1,6 @@
 * {
     font-family: 'Abel';
+    margin-left: 5px;
 }
 
 body {
@@ -14,9 +15,19 @@ a {
     margin-left: 5px;
 }
 
-.text-input {
+.text_input {
     padding: 10px;
     margin: 5px;
+}
+
+.error_text {
+    color: rgb(255, 75, 75);
+}
+
+.error {
+    height: 0;
+    transition: .2s;
+    overflow: hidden;
 }
 
 input[type="submit"] {

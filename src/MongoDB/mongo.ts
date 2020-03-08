@@ -1,7 +1,5 @@
 import mongoose = require("mongoose");
 import express = require("express");
-import { resolve } from "dns";
-import { rejects } from "assert";
 
 const User = require("./Schema/users");
 
@@ -11,7 +9,7 @@ export class MongoDB {
 
     db: mongoose.Connection = mongoose.connection;
     constructor() {
-        mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/test?retryWrites=true&w=majority');
+        mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority');
     }
 
 
@@ -20,6 +18,7 @@ export class MongoDB {
         Promise.all([
             User.create({ name: name, password: password })
         ]).then(() => console.log('Added Users'))
+
     }
 
     async find_user_name(name: string) {
