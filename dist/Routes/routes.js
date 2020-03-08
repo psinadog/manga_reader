@@ -42,43 +42,49 @@ var user_model_1 = require("./User_Model/user_model");
 var User = require("../MongoDB/Schema/users");
 var router = express.Router();
 var mongo = new mongo_1.MongoDB;
-var model = new user_model_1.Model;
-router.get("/", mongo.paginated_results(User), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var cookies_data;
+router.use(function (req, res, next) {
+    if (req.cookies.user_data === undefined) {
+        cookies_data = false;
+    }
+    else {
+        cookies_data = true;
+    }
+    next();
+});
+router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!(req.cookies.user_data === undefined)) return [3 /*break*/, 1];
-                res.render("index", { data: { is_login: false } });
+                if (!!cookies_data) return [3 /*break*/, 1];
+                res.render("index", { data: { is_login: cookies_data } });
                 return [3 /*break*/, 3];
             case 1: return [4 /*yield*/, mongo.find_user_mark(req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"])];
             case 2:
                 _a.sent();
                 if (mongo.boolean_value_get()) {
-                    res.render("index", { data: user_model_1.Model.get(true, req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]) });
-                }
-                else {
-                    res.redirect("/login");
+                    res.render("index", { data: user_model_1.Model.get(cookies_data, req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]) });
                 }
                 _a.label = 3;
             case 3: return [2 /*return*/];
         }
     });
 }); });
-router.get("/login", mongo.paginated_results(User), function (req, res) {
-    if (req.cookies.user_data === undefined)
-        res.render("login", { is_login: false });
+router.get("/login", function (req, res) {
+    if (!cookies_data)
+        res.render("login");
     else
         res.send("you're logged in already");
 });
-router.get("/registration", mongo.paginated_results(User), function (req, res) {
-    if (req.cookies.user_data === undefined)
+router.get("/registration", function (req, res) {
+    if (!cookies_data)
         res.render("registration");
     else
         res.send("you're logged in");
 });
 router.post("/exit", function (req, res) {
     res.clearCookie("user_data");
-    res.redirect("/login");
+    res.redirect("/");
 });
 router.post("/req-page-progress", mongo.paginated_results(User), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user;
@@ -87,7 +93,6 @@ router.post("/req-page-progress", mongo.paginated_results(User), function (req, 
             case 0: return [4 /*yield*/, mongo.find_user_mark(req.body.name, req.body.password)];
             case 1:
                 user = _a.sent();
-                console.log(user);
                 if (!req.body)
                     return [2 /*return*/, res.sendStatus(400)];
                 if (mongo.boolean_value_get()) {
@@ -108,12 +113,14 @@ router.post("/registration-process", function (req, res) { return __awaiter(void
             case 0: return [4 /*yield*/, mongo.find_user_name(req.body.name)];
             case 1:
                 user = _a.sent();
-                if (!mongo.boolean_value_get()) {
-                    mongo.save_user(req.body.name, req.body.password);
-                    res.redirect("/login");
+                if (!req.body)
+                    return [2 /*return*/, res.sendStatus(400)];
+                if (mongo.boolean_value_get()) {
+                    res.json(true);
                 }
                 else {
-                    res.send("that user name exist");
+                    mongo.save_user(req.body.name, req.body.password);
+                    res.json(false);
                 }
                 return [2 /*return*/];
         }

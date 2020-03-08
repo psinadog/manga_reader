@@ -41,7 +41,7 @@ var User = require("./Schema/users");
 var MongoDB = /** @class */ (function () {
     function MongoDB() {
         this.db = mongoose.connection;
-        mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/test?retryWrites=true&w=majority');
+        mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority');
     }
     MongoDB.prototype.save_user = function (name, password) {
         return __awaiter(this, void 0, void 0, function () {

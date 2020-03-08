@@ -29,9 +29,6 @@ router.get("/", async (req: express.Request, res: express.Response) => {
         if (mongo.boolean_value_get()) {
             res.render("index", { data: Model.get(cookies_data, req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]) });
         }
-        else {
-            res.redirect("/");
-        }
     }
 });
 
