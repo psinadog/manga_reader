@@ -1,6 +1,6 @@
 import express = require("express");
 
-
+import { Mail } from "./nodemail";
 import { MongoDB } from "../MongoDB/mongo";
 import { Model } from "./User_Model/user_model";
 import { Verify } from "./Verify_User/verify";
@@ -74,7 +74,14 @@ router.post("/registration-process", async (req: express.Request, res: express.R
     if (mongo.boolean_value_get()) {
         res.json(true);
     } else {
-        mongo.save_user(req.body.name, req.body.password);
+        const mail = new Mail({
+            from: "ilyaspiypiy@gmail.com",
+            to: req.body.email,
+            subject: "ты чмо",
+            text: req.body.email + "соси жопу"
+        })
+        mail.send();
+        mongo.save_user(req.body.name, req.body.password, req.body.email);
         res.json(false);
     }
 

@@ -13,10 +13,10 @@ export class MongoDB {
     }
 
 
-    async save_user(name: string, password: string) {
+    async save_user(name: string, password: string, email: string) {
         if (User.countDocuments().exec() > 0) return
         Promise.all([
-            User.create({ name: name, password: password })
+            User.create({ name: name, password: password, email: email })
         ]).then(() => console.log('Added Users'))
 
     }
