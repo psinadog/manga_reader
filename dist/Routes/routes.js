@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
+var nodemail_1 = require("./nodemail");
 var mongo_1 = require("../MongoDB/mongo");
 var user_model_1 = require("./User_Model/user_model");
 var User = require("../MongoDB/Schema/users");
@@ -107,7 +108,7 @@ router.post("/req-page-progress", mongo.paginated_results(User), function (req, 
     });
 }); });
 router.post("/registration-process", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
+    var user, mail;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, mongo.find_user_name(req.body.name)];
@@ -119,7 +120,14 @@ router.post("/registration-process", function (req, res) { return __awaiter(void
                     res.json(true);
                 }
                 else {
-                    mongo.save_user(req.body.name, req.body.password);
+                    mail = new nodemail_1.Mail({
+                        from: "ilyaspiypiy@gmail.com",
+                        to: req.body.email,
+                        subject: "ты чмо",
+                        text: req.body.email + "соси жопу"
+                    });
+                    mail.send();
+                    mongo.save_user(req.body.name, req.body.password, req.body.email);
                     res.json(false);
                 }
                 return [2 /*return*/];

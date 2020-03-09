@@ -43,13 +43,13 @@ var MongoDB = /** @class */ (function () {
         this.db = mongoose.connection;
         mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority');
     }
-    MongoDB.prototype.save_user = function (name, password) {
+    MongoDB.prototype.save_user = function (name, password, email) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if (User.countDocuments().exec() > 0)
                     return [2 /*return*/];
                 Promise.all([
-                    User.create({ name: name, password: password })
+                    User.create({ name: name, password: password, email: email })
                 ]).then(function () { return console.log('Added Users'); });
                 return [2 /*return*/];
             });
