@@ -6,6 +6,7 @@ const User = require("./Schema/users");
 export class MongoDB {
 
     temp!: boolean;
+    temp_email!: boolean;
 
     db: mongoose.Connection = mongoose.connection;
     constructor() {
@@ -28,10 +29,29 @@ export class MongoDB {
     }
 
 
+    async find_email(email: string) {
+        return User.find({ email: email }, (error: Error, email: {}) => {
+            this.is_exists_email(email);
+        })
+    }
+
+
     find_user_mark(name: string, password: string) {
         return User.find({ name: name, password: password }, (error: Error, users_name: {}) => {
             this.is_exists_set(users_name);
         })
+    }
+
+    is_exists_email(val: any) {
+        if (Object.keys(val).length === 0) {
+            this.temp_email = false
+        } else {
+            this.temp_email = true;
+        }
+    }
+
+    boolean_value_get_email() {
+        return this.temp_email;
     }
 
     is_exists_set(val: any) {

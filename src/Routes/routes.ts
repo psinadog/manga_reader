@@ -2,8 +2,7 @@ import express = require("express");
 
 import { Mail } from "./nodemail";
 import { MongoDB } from "../MongoDB/mongo";
-import { Model } from "./User_Model/user_model";
-import { Verify } from "./Verify_User/verify";
+import { Verify } from "./verify_user";
 
 
 const User = require("../MongoDB/Schema/users");
@@ -12,12 +11,16 @@ const router = express.Router();
 const mongo = new MongoDB;
 
 let cookies_data: boolean;
+let cookies_name: string;
+let cookies_password: string;
 
 router.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (req.cookies.user_data === undefined) {
         cookies_data = false;
     } else {
         cookies_data = true;
+        cookies_name = req.cookies.user_data[0]["name"];
+        cookies_password = req.cookies.user_data[0]["password"];
     }
     next();
 })
@@ -25,9 +28,11 @@ router.use((req: express.Request, res: express.Response, next: express.NextFunct
 router.get("/", async (req: express.Request, res: express.Response) => {
     if (!cookies_data) res.render("index", { data: { is_login: cookies_data } });
     else {
-        await mongo.find_user_mark(req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]);
+        await mongo.find_user_mark(cookies_name, cookies_password);
         if (mongo.boolean_value_get()) {
-            res.render("index", { data: Model.get(cookies_data, req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]) });
+            res.render("index", { data: { cookies_data, cookies_name, cookies_password } });
+        } else {
+            res.clearCookie("user_data");
         }
     }
 });
@@ -40,12 +45,12 @@ router.get("/login", (req: express.Request, res: express.Response) => {
 router.get("/registration", (req: express.Request, res: express.Response) => {
     if (!cookies_data) res.render("registration");
     else res.send("you're logged in");
-})
+});
 
 router.post("/exit", (req: express.Request, res: express.Response) => {
     res.clearCookie("user_data");
     res.redirect("/");
-})
+});
 
 router.post("/req-page-progress", mongo.paginated_results(User), async (req: express.Request, res: express.Response | any) => {
 
@@ -59,7 +64,7 @@ router.post("/req-page-progress", mongo.paginated_results(User), async (req: exp
     }
 
     else {
-        res.send("wrong user name or password");
+        res.json(false);
     }
 
 });
@@ -67,24 +72,44 @@ router.post("/req-page-progress", mongo.paginated_results(User), async (req: exp
 
 router.post("/registration-process", async (req: express.Request, res: express.Response) => {
 
-    const user = await mongo.find_user_name(req.body.name);
+
+    const new_user = new Verify(req.body);
+    const verify = new_user.verify();
+
+    for(let key in verify) {
+        if(verify[key] === false || verify[key] == null) {
+            res.json(verify);
+            return;
+        }
+    }
 
     if (!req.body) return res.sendStatus(400);
 
-    if (mongo.boolean_value_get()) {
-        res.json(true);
-    } else {
-        const mail = new Mail({
-            from: "ilyaspiypiy@gmail.com",
-            to: req.body.email,
-            subject: "ты чмо",
-            text: req.body.email + "соси жопу"
-        })
-        mail.send();
-        mongo.save_user(req.body.name, req.body.password, req.body.email);
-        res.json(false);
+    await mongo.find_user_name(req.body.name);
+    await mongo.find_email(req.body.email);
+
+    const exists = {
+        name: mongo.boolean_value_get(),
+        email: mongo.boolean_value_get_email()
+    }
+    const message = {
+        from: "ilyaspiypiy@gmail.com",
+        to: req.body.email,
+        subject: "ты чмо",
+        text: "соси жопу"
     }
 
+    if (mongo.boolean_value_get() || mongo.boolean_value_get_email()) {
+        res.json(exists);
+        return;
+    } 
+
+    const mail = new Mail(message);
+    mail.send();
+    mongo.save_user(req.body.name, req.body.password, req.body.email);
+    res.json(exists);
+    
 });
+
 
 export default router;

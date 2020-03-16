@@ -7,25 +7,29 @@
     <title>Регистрация</title>
     <link href="https://fonts.googleapis.com/css?family=Abel&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="stylesheets/main.css">
+    <link rel="stylesheet" href="stylesheets/ne_spizdil.css">
 </head>
 
 <body>
     <form name="reg-form">
-        <div class="error" id="error">
-            <p id="error_text"></p>
+        <h1>Registration</h1>
+        <div class="question">
+          <input type="text" name="name" id="name"  required/>
+          <label>User name</label>
         </div>
-        <input type="text" name="name" class="text_input" id="name" placeholder="User name"><label for="name"
-            id="name_label"></label>
-        <br>
-        <input type="password" name="password" class="text_input" placeholder="Password"><label for="password"
-            id="password_label"></label> <br>
-        <input type="password" name="password_reenter" class="text_input" placeholder="Re enter password"><label
-            for="password" id="password_reenter_label"></label> <br>
-        <input type="email" name="email" class="text_input" placeholder="Email"> <br>
-        <input type="submit" value="regstration" id="submit" onclick="lockoutSubmit(this)">
-    </form>
+        <div class="question">
+            <input type="password" name="password" required/>
+            <label>Password</label>
+          </div>
+        <div class="question">
+          <input type="text" name="email" required/>
+          <label>Email Address</label>
+        </div>
+        <input type="submit" value="regstration" id="submit" onclick="lockout_submit(this)">
+      </form>
     <script src="js/registration.js">
     </script>
+
 </body>
 
 </html>
