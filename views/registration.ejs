@@ -1,57 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Регистрация</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Abel&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="stylesheets/main.css" />
-    <link rel="stylesheet" href="stylesheets/form_styles.css" />
-  </head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Регистрация
+        </title>
+        <link href="https://fonts.googleapis.com/css?family=Abel&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="stylesheets/main.css" />
+        <link rel="stylesheet" href="stylesheets/form_styles.css" />
+    </head>
 
-  <body>
-    <form name="reg-form">
-      <h1>Registration</h1>
-      <div class="question">
-        <input
-          type="text"
-          name="name"
-          id="name_id"
-          autocomplete="off"
-          required
-        />
-        <label id="name_label">User name</label>
-      </div>
-      <div class="question">
-        <input
-          type="password"
-          id="password_id"
-          name="password"
-          autocomplete="off"
-          required
-        />
-        <label id="password_label">Password</label>
-      </div>
-      <div class="question">
-        <input
-          type="text"
-          id="email_id"
-          name="email"
-          autocomplete="off"
-          required
-        />
-        <label id="email_label">Email Address</label>
-      </div>
-      <input
-        type="submit"
-        value="regstration"
-        id="submit"
-        onclick="lockout_submit(this)"
-      />
-    </form>
-    <script src="js/registration.js"></script>
-  </body>
+    <body>
+        <form name="reg-form">
+            <h1>
+                Registration
+            </h1>
+            <div class="question">
+                <input type="text" name="name" id="name_id" autocomplete="off" required />
+                <label id="name_label">User name</label>
+            </div>
+            <div class="question">
+                <input type="password" id="password_id" name="password" autocomplete="off" required />
+                <label id="password_label">Password</label>
+            </div>
+            <div class="question">
+                <input type="text" id="email_id" name="email" autocomplete="off" required />
+                <label id="email_label">Email Address</label>
+            </div>
+            <input type="submit" value="regstration" id="submit" onclick="lockout_submit(this)" />
+        </form>
+        <script src="js/registration.js"></script>
+    </body>
 </html>
