@@ -37,13 +37,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
-var path = require("path");
 var crypto = require("crypto");
 var mongoose = require("mongoose");
 var multer = require("multer");
 var GridFsStorage = require("multer-gridfs-storage");
 var Grid = require("gridfs-stream");
-var methodOverride = require("method-override");
 var mongo_1 = require("../MongoDB/mongo");
 var User = require("../MongoDB/Schema/users");
 var router = express.Router();
@@ -110,9 +108,8 @@ var storage = new GridFsStorage({
                 /**
                  * Имя как ссылки
                  */
-                var filename = req.body.name;
                 var fileInfo = {
-                    filename: filename,
+                    filename: "ASD",
                     /**
                      * Сделать динамическую смену бакетов
                      */

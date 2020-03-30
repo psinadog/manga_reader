@@ -1,11 +1,9 @@
 import express = require("express");
-const path = require("path");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
-const methodOverride = require("method-override");
 
 import { MongoDB } from "../MongoDB/mongo";
 
@@ -71,9 +69,8 @@ const storage = new GridFsStorage({
                 /**
                  * Имя как ссылки
                  */
-                const filename = req.body.name;
                 const fileInfo = {
-                    filename: filename,
+                    filename: "ASD",
                     /**
                      * Сделать динамическую смену бакетов
                      */
