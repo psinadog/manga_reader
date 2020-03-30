@@ -17,16 +17,18 @@ export class MongoDB {
         Promise.all([User.create({ name: name, password: password, email: email })]).then(() => console.log("Added Users"));
     }
 
-    async find_user_name(name: string) {
-        return User.find({ name: name }, (error: Error, users_name: {}) => {
-            this.is_exists_set(users_name);
-        });
-    }
+    async find_one(name: string) {
+        let search_result;
 
-    async find_email(email: string) {
-        return User.find({ email: email }, (error: Error, email: {}) => {
-            this.is_exists_email(email);
+        await User.find({ name: name }, (err, users) => {
+            search_result = users;
         });
+
+        if (search_result.length === 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     find_user_mark(name: string, password: string) {
@@ -34,7 +36,12 @@ export class MongoDB {
             this.is_exists_set(users_name);
         });
     }
-
+    /**
+     *
+     * @param val
+     *
+     * УБРАТЬ НАААААААААААААААААААХУЙ
+     */
     is_exists_email(val: any) {
         if (Object.keys(val).length === 0) {
             this.temp_email = false;

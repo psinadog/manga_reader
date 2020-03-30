@@ -39,17 +39,21 @@ exports.__esModule = true;
 var express = require("express");
 var nodemail_1 = require("./nodemail");
 var mongo_1 = require("../MongoDB/mongo");
-var user_model_1 = require("./User_Model/user_model");
+var verify_user_1 = require("./verify_user");
 var User = require("../MongoDB/Schema/users");
 var router = express.Router();
-var mongo = new mongo_1.MongoDB;
+var mongo = new mongo_1.MongoDB();
 var cookies_data;
+var cookies_name;
+var cookies_password;
 router.use(function (req, res, next) {
     if (req.cookies.user_data === undefined) {
         cookies_data = false;
     }
     else {
         cookies_data = true;
+        cookies_name = req.cookies.user_data[0]["name"];
+        cookies_password = req.cookies.user_data[0]["password"];
     }
     next();
 });
@@ -60,11 +64,20 @@ router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 if (!!cookies_data) return [3 /*break*/, 1];
                 res.render("index", { data: { is_login: cookies_data } });
                 return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, mongo.find_user_mark(req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"])];
+            case 1: return [4 /*yield*/, mongo.find_user_mark(cookies_name, cookies_password)];
             case 2:
                 _a.sent();
                 if (mongo.boolean_value_get()) {
-                    res.render("index", { data: user_model_1.Model.get(cookies_data, req.cookies.user_data[0]["name"], req.cookies.user_data[0]["password"]) });
+                    res.render("index", {
+                        data: {
+                            is_login: cookies_data,
+                            name: cookies_name,
+                            password: cookies_password
+                        }
+                    });
+                }
+                else {
+                    res.clearCookie("user_data");
                 }
                 _a.label = 3;
             case 3: return [2 /*return*/];
@@ -101,36 +114,48 @@ router.post("/req-page-progress", mongo.paginated_results(User), function (req, 
                     res.redirect("/");
                 }
                 else {
-                    res.send("wrong user name or password");
+                    res.json(false);
                 }
                 return [2 /*return*/];
         }
     });
 }); });
 router.post("/registration-process", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, mail;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, mongo.find_user_name(req.body.name)];
-            case 1:
-                user = _a.sent();
+    var new_user, verify, exist, _a, message, mail;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                new_user = new verify_user_1.Verify(req.body);
+                verify = new_user.verify() && new_user.is_empty();
+                if (!verify) {
+                    return [2 /*return*/, res.json(verify)];
+                }
                 if (!req.body)
                     return [2 /*return*/, res.sendStatus(400)];
-                if (mongo.boolean_value_get()) {
-                    res.json(true);
+                return [4 /*yield*/, mongo.find_one(req.body.name)];
+            case 1:
+                _a = (_b.sent());
+                if (!_a) return [3 /*break*/, 3];
+                return [4 /*yield*/, mongo.find_one(req.body.email)];
+            case 2:
+                _a = (_b.sent());
+                _b.label = 3;
+            case 3:
+                exist = _a;
+                console.log(exist);
+                message = {
+                    from: "ilyaspiypiy@gmail.com",
+                    to: req.body.email,
+                    subject: "Test",
+                    text: "работает"
+                };
+                if (!exist) {
+                    return [2 /*return*/, res.json(exist)];
                 }
-                else {
-                    mail = new nodemail_1.Mail({
-                        from: "ilyaspiypiy@gmail.com",
-                        to: req.body.email,
-                        subject: "ты чмо",
-                        text: req.body.email + "соси жопу"
-                    });
-                    mail.send();
-                    mongo.save_user(req.body.name, req.body.password, req.body.email);
-                    res.json(false);
-                }
-                return [2 /*return*/];
+                mail = new nodemail_1.Mail(message);
+                mail.send();
+                mongo.save_user(req.body.name, req.body.password, req.body.email);
+                return [2 /*return*/, res.json(exist)];
         }
     });
 }); });

@@ -41,27 +41,36 @@ var User = require("./Schema/users");
 var MongoDB = /** @class */ (function () {
     function MongoDB() {
         this.db = mongoose.connection;
-        mongoose.connect('mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority');
+        mongoose.connect("mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority");
     }
     MongoDB.prototype.save_user = function (name, password, email) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if (User.countDocuments().exec() > 0)
                     return [2 /*return*/];
-                Promise.all([
-                    User.create({ name: name, password: password, email: email })
-                ]).then(function () { return console.log('Added Users'); });
+                Promise.all([User.create({ name: name, password: password, email: email })]).then(function () { return console.log("Added Users"); });
                 return [2 /*return*/];
             });
         });
     };
-    MongoDB.prototype.find_user_name = function (name) {
+    MongoDB.prototype.find_one = function (name) {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
+            var search_result;
             return __generator(this, function (_a) {
-                return [2 /*return*/, User.find({ name: name }, function (error, users_name) {
-                        _this.is_exists_set(users_name);
-                    })];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, User.find({ name: name }, function (err, users) {
+                            search_result = users;
+                        })];
+                    case 1:
+                        _a.sent();
+                        if (search_result.length === 0) {
+                            return [2 /*return*/, true];
+                        }
+                        else {
+                            return [2 /*return*/, false];
+                        }
+                        return [2 /*return*/];
+                }
             });
         });
     };
@@ -70,6 +79,23 @@ var MongoDB = /** @class */ (function () {
         return User.find({ name: name, password: password }, function (error, users_name) {
             _this.is_exists_set(users_name);
         });
+    };
+    /**
+     *
+     * @param val
+     *
+     * УБРАТЬ НАААААААААААААААААААХУЙ
+     */
+    MongoDB.prototype.is_exists_email = function (val) {
+        if (Object.keys(val).length === 0) {
+            this.temp_email = false;
+        }
+        else {
+            this.temp_email = true;
+        }
+    };
+    MongoDB.prototype.boolean_value_get_email = function () {
+        return this.temp_email;
     };
     MongoDB.prototype.is_exists_set = function (val) {
         if (Object.keys(val).length === 0) {
@@ -117,7 +143,11 @@ var MongoDB = /** @class */ (function () {
                     case 2:
                         _c.trys.push([2, 4, , 5]);
                         _b = results;
-                        return [4 /*yield*/, model.find().limit(limit).skip(startIndex).exec()];
+                        return [4 /*yield*/, model
+                                .find()
+                                .limit(limit)
+                                .skip(startIndex)
+                                .exec()];
                     case 3:
                         _b.results = _c.sent();
                         res.paginatedResults = results;

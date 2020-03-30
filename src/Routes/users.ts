@@ -48,10 +48,7 @@ router.get("/", mongo.paginated_results(User), async (req: express.Request, res:
  */
 
 const mongoURI = "mongodb+srv://gokutok:111111ab@cluster0-070mp.mongodb.net/test?retryWrites=true&w=majority";
-const conn = mongoose.createConnection(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+const conn = mongoose.createConnection(mongoURI);
 
 let gfs;
 

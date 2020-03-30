@@ -1,10 +1,10 @@
-export class Verify {
-    user: { name: string; password: string; email: string };
-    constructor(user: { name: string; password: string; email: string }) {
+"use strict";
+exports.__esModule = true;
+var Verify = /** @class */ (function () {
+    function Verify(user) {
         this.user = user;
     }
-
-    verify() {
+    Verify.prototype.verify = function () {
         if (this.user.name.length < 4) {
             return false;
         }
@@ -15,13 +15,15 @@ export class Verify {
             return false;
         }
         return true;
-    }
-    is_empty() {
-        for (let key in this.user) {
+    };
+    Verify.prototype.is_empty = function () {
+        for (var key in this.user) {
             if (this.user[key] === "") {
                 return false;
             }
         }
         return true;
-    }
-}
+    };
+    return Verify;
+}());
+exports.Verify = Verify;

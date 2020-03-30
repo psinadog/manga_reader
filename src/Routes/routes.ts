@@ -7,7 +7,6 @@ import { Intermediate } from "./deps";
 
 const User = require("../MongoDB/Schema/users");
 const router = express.Router();
-const intermediate = new Intermediate();
 
 const mongo = new MongoDB();
 
@@ -27,7 +26,6 @@ router.use((req: express.Request, res: express.Response, next: express.NextFunct
 });
 
 router.get("/", async (req: express.Request, res: express.Response) => {
-    console.log(intermediate.verify_cookies(req, res));
     if (!cookies_data) res.render("index", { data: { is_login: cookies_data } });
     else {
         await mongo.find_user_mark(cookies_name, cookies_password);
@@ -75,24 +73,18 @@ router.post("/req-page-progress", mongo.paginated_results(User), async (req: exp
 
 router.post("/registration-process", async (req: express.Request, res: express.Response) => {
     const new_user = new Verify(req.body);
-    const verify = new_user.verify();
+    const verify = new_user.verify() && new_user.is_empty();
 
-    for (let key in verify) {
-        if (verify[key] === false || verify[key] == null) {
-            res.json(verify);
-            return;
-        }
+    if (!verify) {
+        return res.json(verify);
     }
 
     if (!req.body) return res.sendStatus(400);
 
-    await mongo.find_user_name(req.body.name);
-    await mongo.find_email(req.body.email);
+    const exist = (await mongo.find_one(req.body.name)) && (await mongo.find_one(req.body.email));
 
-    const exists = {
-        name: mongo.boolean_value_get(),
-        email: mongo.boolean_value_get_email()
-    };
+    console.log(exist);
+
     const message = {
         from: "ilyaspiypiy@gmail.com",
         to: req.body.email,
@@ -100,15 +92,14 @@ router.post("/registration-process", async (req: express.Request, res: express.R
         text: "работает"
     };
 
-    if (mongo.boolean_value_get() || mongo.boolean_value_get_email()) {
-        res.json(exists);
-        return;
+    if (!exist) {
+        return res.json(exist);
     }
 
     const mail = new Mail(message);
     mail.send();
     mongo.save_user(req.body.name, req.body.password, req.body.email);
-    res.json(exists);
+    return res.json(exist);
 });
 
 export default router;

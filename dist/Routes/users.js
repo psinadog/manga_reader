@@ -37,27 +37,158 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
+var path = require("path");
+var crypto = require("crypto");
+var mongoose = require("mongoose");
+var multer = require("multer");
+var GridFsStorage = require("multer-gridfs-storage");
+var Grid = require("gridfs-stream");
+var methodOverride = require("method-override");
 var mongo_1 = require("../MongoDB/mongo");
 var User = require("../MongoDB/Schema/users");
 var router = express.Router();
-var mongo = new mongo_1.MongoDB;
+var mongo = new mongo_1.MongoDB();
+var cookies_data;
+var cookies_name;
+var cookies_password;
+router.use(function (req, res, next) {
+    if (req.cookies.user_data === undefined) {
+        cookies_data = false;
+    }
+    else {
+        cookies_data = true;
+        cookies_name = req.cookies.user_data[0]["name"];
+        cookies_password = req.cookies.user_data[0]["password"];
+    }
+    next();
+});
 router.get("/", mongo.paginated_results(User), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var next, previous;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, JSON.stringify(res.paginatedResults.next.page)];
+            case 0: return [4 /*yield*/, res.paginatedResults.next.page];
             case 1:
                 next = _a.sent();
-                return [4 /*yield*/, JSON.stringify(res.paginatedResults.previous.page)];
+                return [4 /*yield*/, res.paginatedResults.previous.page];
             case 2:
                 previous = _a.sent();
                 res.render("content", {
                     paginated_results: JSON.stringify(res.paginatedResults),
                     next: next,
-                    previous: previous
+                    previous: previous,
+                    data: {
+                        is_login: cookies_data,
+                        name: cookies_name,
+                        password: cookies_password
+                    }
                 });
                 return [2 /*return*/];
         }
     });
 }); });
+/**
+ * Распределить по классам
+ */
+var mongoURI = "mongodb+srv://gokutok:111111ab@cluster0-070mp.mongodb.net/test?retryWrites=true&w=majority";
+var conn = mongoose.createConnection(mongoURI);
+var gfs;
+conn.once("open", function () {
+    gfs = Grid(conn.db, mongoose.mongo);
+    /**
+     * Сделать динамическую смену бакетов
+     */
+    gfs.collection("uploads2");
+});
+var storage = new GridFsStorage({
+    url: mongoURI,
+    file: function (req, file) {
+        return new Promise(function (resolve, reject) {
+            crypto.randomBytes(16, function (err, buf) {
+                if (err) {
+                    return reject(err);
+                }
+                /**
+                 * Имя как ссылки
+                 */
+                var filename = req.body.name;
+                var fileInfo = {
+                    filename: filename,
+                    /**
+                     * Сделать динамическую смену бакетов
+                     */
+                    bucketName: "uploads2"
+                };
+                resolve(fileInfo);
+            });
+        });
+    }
+});
+var upload = multer({ storage: storage });
+router.get("/:id", function (req, res) {
+    gfs.files.find().toArray(function (err, files) {
+        if (!files || files.length === 0) {
+            res.render("images_view", { files: false });
+        }
+        else {
+            files.map(function (file) {
+                if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+                    file.isImage = true;
+                }
+                else {
+                    file.isImage = false;
+                }
+            });
+            res.render("images_view", { files: files });
+        }
+    });
+});
+router.post("/upload", upload.array("file"), function (req, res) {
+    res.redirect("/images");
+});
+router.get("/files", function (req, res) {
+    gfs.files.find().toArray(function (err, files) {
+        if (!files || files.length === 0) {
+            return res.status(404).json({
+                err: "No files exist"
+            });
+        }
+        return res.json(files);
+    });
+});
+router.get("/files/:filename", function (req, res) {
+    gfs.files.findOne({ filename: req.params.filename }, function (err, file) {
+        if (!file || file.length === 0) {
+            return res.status(404).json({
+                err: "No file exists"
+            });
+        }
+        return res.json(file);
+    });
+});
+router.get("/image/:filename", function (req, res) {
+    gfs.files.findOne({ filename: req.params.filename }, function (err, file) {
+        if (!file || file.length === 0) {
+            return res.status(404).json({
+                err: "No file exists"
+            });
+        }
+        if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+            var readstream = gfs.createReadStream(file.filename);
+            readstream.pipe(res);
+        }
+        else {
+            res.status(404).json({
+                err: "Not an image"
+            });
+        }
+    });
+});
+router.post("/files/:id", function (req, res) {
+    gfs.remove({ _id: req.params.id, root: "uploads" }, function (err, gridStore) {
+        if (err) {
+            return res.status(404).json({ err: err });
+        }
+        res.redirect("/");
+    });
+});
 exports["default"] = router;

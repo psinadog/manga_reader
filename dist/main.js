@@ -8,7 +8,7 @@ var routes_1 = require("./Routes/routes");
 var users_1 = require("./Routes/users");
 var app = express();
 var PORT = process.env.PORT || 80;
-app.engine('ejs', engine);
+app.engine("ejs", engine);
 app.use(cookie());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

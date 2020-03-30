@@ -5,15 +5,15 @@ var Mail = /** @class */ (function () {
     function Mail(options) {
         this.transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
-            service: "gmail",
             port: 465,
-            secure: false,
+            secure: true,
             auth: {
+                type: 'OAuth2',
                 user: 'ilyaspiypiy@gmail.com',
-                pass: "111111ab"
-            },
-            tls: {
-                rejectUnauthorized: false
+                clientId: '537215972931-d7lib7p8fdgt9b00f2brcmff6t8gu9l3.apps.googleusercontent.com',
+                clientSecret: 'VCLIztDMO-MzuLuDHLNVpaM2',
+                refreshToken: '1//04EGCMoE3K2ljCgYIARAAGAQSNwF-L9IrPRgUx2huPWxAmTQrsM9HJxsZxcvS2IQQ54y6FkLheYMBNz0gVtuicSRPAJIrgJT2UCk',
+                accessToken: 'ya29.a0Adw1xeUD38fMcEl3NlF6gsX2eVi0kXjrgiqBuBmhAt_k3dlTB9v1rt2Mhf975WTDNczTooW4doo6Qiv5qYtvDb-JlmAgL0hlUyiw1dAyJOl9lkWGxBmAeVhJ2VbxifVHNclLTl4PPiuHLiIVanDZYKwCMs4Rf081vd8'
             }
         });
         this.options = options;
