@@ -43,6 +43,14 @@ router.get("/upload", (req: express.Request, res: express.Response) => {
         res.render("upload", { content: content });
     });
 });
+
+router.get("/:id", (req: express.Request, res: express.Response) => {
+    console.log(req.params.id);
+    Manga.find({ _id: req.params.id }, (err, content) => {
+        res.render("upload", { content: content });
+    });
+});
+
 router.post("/upload", (req: express.Request, res: express.Response) => {
     Promise.all([Manga.create({ folder_name: req.body.folder_name, folder_content: req.body.folder_content })]).then(() => console.log("Added Manga"));
 });

@@ -6,7 +6,7 @@
         <title>Document</title>
     </head>
     <body>
-        <% if(content[0] !== undefined) {%>
+        <% if(content !== undefined) {%>
         <img src="/images/<%= content[0].folder_name %>/<%= content[0].folder_content[0] %>" alt="" />
         <% } %>
         <form action="upload/" method="post">
