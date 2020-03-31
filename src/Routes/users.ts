@@ -37,10 +37,10 @@ router.get("/", mongo.paginated_results(User), async (req: express.Request, res:
         }
     });
 });
-mongoose.connect("mongodb+srv://gokutok:111111ab@cluster0-070mp.mongodb.net/test?retryWrites=true&w=majority");
+
 router.get("/upload", (req: express.Request, res: express.Response) => {
-    Manga.find({ _id: "5e8333d883841e05dc1d0e72" }, async (err, content) => {
-        res.render("upload", { content: await content });
+    Manga.find({ _id: "5e8333f949ea8b0ad4f6c960" }, (err, content) => {
+        res.render("upload", { content: content });
     });
 });
 router.post("/upload", (req: express.Request, res: express.Response) => {

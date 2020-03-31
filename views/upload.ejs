@@ -6,7 +6,9 @@
         <title>Document</title>
     </head>
     <body>
+        <% if(content[0] !== undefined) {%>
         <img src="/images/<%= content[0].folder_name %>/<%= content[0].folder_content[0] %>" alt="" />
+        <% } %>
         <form action="upload/" method="post">
             <input type="text" name="folder_name" />
             <input type="file" name="folder_content" webkitdirectory directory multiple />
