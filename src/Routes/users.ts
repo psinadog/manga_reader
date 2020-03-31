@@ -1,13 +1,10 @@
 import express = require("express");
-const crypto = require("crypto");
-const mongoose = require("mongoose");
-const multer = require("multer");
-const GridFsStorage = require("multer-gridfs-storage");
-const Grid = require("gridfs-stream");
-
+import mongoose = require("mongoose");
 import { MongoDB } from "../MongoDB/mongo";
 
 const User = require("../MongoDB/Schema/users");
+const Manga = require("../MongoDB/Schema/manga");
+
 const router = express.Router();
 const mongo = new MongoDB();
 
@@ -40,118 +37,14 @@ router.get("/", mongo.paginated_results(User), async (req: express.Request, res:
         }
     });
 });
-
-/**
- * Распределить по классам
- */
-
-const mongoURI = "mongodb+srv://gokutok:111111ab@cluster0-070mp.mongodb.net/test?retryWrites=true&w=majority";
-const conn = mongoose.createConnection(mongoURI);
-
-let gfs;
-
-conn.once("open", () => {
-    gfs = Grid(conn.db, mongoose.mongo);
-    /**
-     * Сделать динамическую смену бакетов
-     */
-    gfs.collection("uploads2");
-});
-
-const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) => {
-        return new Promise((resolve, reject) => {
-            crypto.randomBytes(16, (err, buf) => {
-                if (err) {
-                    return reject(err);
-                }
-                /**
-                 * Имя как ссылки
-                 */
-                const fileInfo = {
-                    filename: "ASD",
-                    /**
-                     * Сделать динамическую смену бакетов
-                     */
-                    bucketName: "uploads2"
-                };
-                resolve(fileInfo);
-            });
-        });
-    }
-});
-const upload = multer({ storage });
-router.get("/:id", (req, res) => {
-    gfs.files.find().toArray((err, files) => {
-        if (!files || files.length === 0) {
-            res.render("images_view", { files: false });
-        } else {
-            files.map(file => {
-                if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
-                    file.isImage = true;
-                } else {
-                    file.isImage = false;
-                }
-            });
-            res.render("images_view", { files: files });
-        }
+mongoose.connect("mongodb+srv://gokutok:111111ab@cluster0-070mp.mongodb.net/test?retryWrites=true&w=majority");
+router.get("/upload", (req: express.Request, res: express.Response) => {
+    Manga.find({ _id: "5e8333d883841e05dc1d0e72" }, async (err, content) => {
+        res.render("upload", { content: await content });
     });
 });
-
-router.post("/upload", upload.array("file"), (req, res) => {
-    res.redirect("/images");
+router.post("/upload", (req: express.Request, res: express.Response) => {
+    Promise.all([Manga.create({ folder_name: req.body.folder_name, folder_content: req.body.folder_content })]).then(() => console.log("Added Manga"));
 });
 
-router.get("/files", (req, res) => {
-    gfs.files.find().toArray((err, files) => {
-        if (!files || files.length === 0) {
-            return res.status(404).json({
-                err: "No files exist"
-            });
-        }
-
-        return res.json(files);
-    });
-});
-
-router.get("/files/:filename", (req, res) => {
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        if (!file || file.length === 0) {
-            return res.status(404).json({
-                err: "No file exists"
-            });
-        }
-
-        return res.json(file);
-    });
-});
-
-router.get("/image/:filename", (req, res) => {
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        if (!file || file.length === 0) {
-            return res.status(404).json({
-                err: "No file exists"
-            });
-        }
-
-        if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
-            const readstream = gfs.createReadStream(file.filename);
-            readstream.pipe(res);
-        } else {
-            res.status(404).json({
-                err: "Not an image"
-            });
-        }
-    });
-});
-
-router.post("/files/:id", (req, res) => {
-    gfs.remove({ _id: req.params.id, root: "uploads" }, (err, gridStore) => {
-        if (err) {
-            return res.status(404).json({ err: err });
-        }
-        res.redirect("/");
-    });
-});
 export default router;

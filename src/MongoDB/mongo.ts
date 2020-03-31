@@ -4,9 +4,6 @@ import express = require("express");
 const User = require("./Schema/users");
 
 export class MongoDB {
-    temp!: boolean;
-    temp_email!: boolean;
-
     db: mongoose.Connection = mongoose.connection;
     constructor() {
         mongoose.connect("mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority");
@@ -31,41 +28,19 @@ export class MongoDB {
         }
     }
 
-    find_user_mark(name: string, password: string) {
-        return User.find({ name: name, password: password }, (error: Error, users_name: {}) => {
-            this.is_exists_set(users_name);
+    async find_user(name: string, password: string) {
+        let search_result;
+
+        await User.find({ name: name, password: password }, (err, users) => {
+            search_result = users;
         });
-    }
-    /**
-     *
-     * @param val
-     *
-     * УБРАТЬ НАААААААААААААААААААХУЙ
-     */
-    is_exists_email(val: any) {
-        if (Object.keys(val).length === 0) {
-            this.temp_email = false;
+
+        if (search_result === undefined) {
+            return true;
         } else {
-            this.temp_email = true;
+            return false;
         }
     }
-
-    boolean_value_get_email() {
-        return this.temp_email;
-    }
-
-    is_exists_set(val: any) {
-        if (Object.keys(val).length === 0) {
-            this.temp = false;
-        } else {
-            this.temp = true;
-        }
-    }
-
-    boolean_value_get() {
-        return this.temp;
-    }
-
     paginated_results(model: any) {
         return async (req: express.Request, res: express.Response | any, next: express.NextFunction) => {
             const results = {

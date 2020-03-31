@@ -28,8 +28,8 @@ router.use((req: express.Request, res: express.Response, next: express.NextFunct
 router.get("/", async (req: express.Request, res: express.Response) => {
     if (!cookies_data) res.render("index", { data: { is_login: cookies_data } });
     else {
-        await mongo.find_user_mark(cookies_name, cookies_password);
-        if (mongo.boolean_value_get()) {
+        const user = await mongo.find_user(cookies_name, cookies_password);
+        if (!user) {
             res.render("index", {
                 data: {
                     is_login: cookies_data,
@@ -59,11 +59,11 @@ router.post("/exit", (req: express.Request, res: express.Response) => {
 });
 
 router.post("/req-page-progress", mongo.paginated_results(User), async (req: express.Request, res: express.Response | any) => {
-    const user = await mongo.find_user_mark(req.body.name, req.body.password);
+    const user = await mongo.find_user(cookies_name, cookies_password);
 
     if (!req.body) return res.sendStatus(400);
 
-    if (mongo.boolean_value_get()) {
+    if (!user) {
         res.cookie("user_data", user);
         res.redirect("/");
     } else {
