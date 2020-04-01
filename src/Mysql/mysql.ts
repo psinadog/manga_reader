@@ -6,10 +6,10 @@ export class Mysql {
     knex = require("knex")({
         client: "mysql",
         connection: {
-            host: "localhost",
-            user: "root",
-            password: "password",
-            database: "manga_reader"
+            host: "bi2jnwdmlse79o7fxemx-mysql.services.clever-cloud.com",
+            user: "u3iyfoj9l0m1qcmx",
+            password: "VKYmppnmFQrZSLBbDfCk",
+            database: "bi2jnwdmlse79o7fxemx"
         },
         acquireConnectionTimeout: 3000,
         useNullAsDefault: true
@@ -23,7 +23,7 @@ export class Mysql {
                 mail: email
             }
         ];
-        this.knex("user")
+        this.knex("USER")
             .insert(d)
             .then(() => console.log("data inserted"))
             .catch(err => {
@@ -33,7 +33,7 @@ export class Mysql {
     }
     async find_one(name: string) {
         let search_result;
-        await this.knex("user")
+        await this.knex("USER")
             .select("*")
             .where("NAME", name)
             .orWhere("MAIL", name)
@@ -53,7 +53,7 @@ export class Mysql {
         }
         let search_result;
         console.log(name);
-        await this.knex("user")
+        await this.knex("USER")
             .where("NAME", name)
             .andWhere("PASSWORD", password)
             .then(user => {

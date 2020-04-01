@@ -38,11 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var nodemail_1 = require("./nodemail");
-var mongo_1 = require("../MongoDB/mongo");
+var mysql_1 = require("../Mysql/mysql");
 var verify_user_1 = require("./verify_user");
-var User = require("../MongoDB/Schema/users");
 var router = express.Router();
-var mongo = new mongo_1.MongoDB();
+var mysql = new mysql_1.Mysql();
 var cookies_data;
 var cookies_name;
 var cookies_password;
@@ -58,58 +57,46 @@ router.use(function (req, res, next) {
     next();
 });
 router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                if (!!cookies_data) return [3 /*break*/, 1];
-                res.render("index", { data: { is_login: cookies_data } });
-                return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, mongo.find_user_mark(cookies_name, cookies_password)];
-            case 2:
-                _a.sent();
-                if (mongo.boolean_value_get()) {
-                    res.render("index", {
-                        data: {
-                            is_login: cookies_data,
-                            name: cookies_name,
-                            password: cookies_password
-                        }
-                    });
-                }
+            case 0: return [4 /*yield*/, mysql.find_user(cookies_name, cookies_password)];
+            case 1:
+                user = _a.sent();
+                if (user)
+                    res.render("index", { data: { is_login: cookies_data } });
                 else {
-                    res.clearCookie("user_data");
+                    if (!user) {
+                        res.render("index", {
+                            data: {
+                                is_login: cookies_data,
+                                name: cookies_name,
+                                password: cookies_password
+                            }
+                        });
+                    }
+                    else {
+                        res.clearCookie("user_data");
+                    }
                 }
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });
-router.get("/login", function (req, res) {
-    if (!cookies_data)
-        res.render("login");
-    else
-        res.send("you're logged in already");
-});
-router.get("/registration", function (req, res) {
-    if (!cookies_data)
-        res.render("registration");
-    else
-        res.send("you're logged in");
-});
 router.post("/exit", function (req, res) {
     res.clearCookie("user_data");
     res.redirect("/");
 });
-router.post("/req-page-progress", mongo.paginated_results(User), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+router.post("/req-page-progress", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, mongo.find_user_mark(req.body.name, req.body.password)];
+            case 0: return [4 /*yield*/, mysql.find_user(req.body.name, req.body.password)];
             case 1:
                 user = _a.sent();
                 if (!req.body)
                     return [2 /*return*/, res.sendStatus(400)];
-                if (mongo.boolean_value_get()) {
+                if (!user) {
                     res.cookie("user_data", user);
                     res.redirect("/");
                 }
@@ -132,17 +119,16 @@ router.post("/registration-process", function (req, res) { return __awaiter(void
                 }
                 if (!req.body)
                     return [2 /*return*/, res.sendStatus(400)];
-                return [4 /*yield*/, mongo.find_one(req.body.name)];
+                return [4 /*yield*/, mysql.find_one(req.body.name)];
             case 1:
                 _a = (_b.sent());
                 if (!_a) return [3 /*break*/, 3];
-                return [4 /*yield*/, mongo.find_one(req.body.email)];
+                return [4 /*yield*/, mysql.find_one(req.body.email)];
             case 2:
                 _a = (_b.sent());
                 _b.label = 3;
             case 3:
                 exist = _a;
-                console.log(exist);
                 message = {
                     from: "ilyaspiypiy@gmail.com",
                     to: req.body.email,
@@ -154,7 +140,7 @@ router.post("/registration-process", function (req, res) { return __awaiter(void
                 }
                 mail = new nodemail_1.Mail(message);
                 mail.send();
-                mongo.save_user(req.body.name, req.body.password, req.body.email);
+                mysql.save_user(req.body.name, req.body.password, req.body.email);
                 return [2 /*return*/, res.json(exist)];
         }
     });

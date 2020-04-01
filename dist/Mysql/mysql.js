@@ -36,30 +36,46 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var mongoose = require("mongoose");
-var User = require("./Schema/users");
-var MongoDB = /** @class */ (function () {
-    function MongoDB() {
-        this.db = mongoose.connection;
-        mongoose.connect("mongodb+srv://gokutok:111111ab@cluster0-pu7z4.azure.mongodb.net/mangaDB?retryWrites=true&w=majority");
+var Mysql = /** @class */ (function () {
+    function Mysql() {
+        this.knex = require("knex")({
+            client: "mysql",
+            connection: {
+                host: "localhost",
+                user: "root",
+                password: "password",
+                database: "manga_reader"
+            },
+            acquireConnectionTimeout: 3000,
+            useNullAsDefault: true
+        });
     }
-    MongoDB.prototype.save_user = function (name, password, email) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (User.countDocuments().exec() > 0)
-                    return [2 /*return*/];
-                Promise.all([User.create({ name: name, password: password, email: email })]).then(function () { return console.log("Added Users"); });
-                return [2 /*return*/];
-            });
+    Mysql.prototype.save_user = function (name, password, email) {
+        var d = [
+            {
+                name: name,
+                password: password,
+                mail: email
+            }
+        ];
+        this.knex("user")
+            .insert(d)
+            .then(function () { return console.log("data inserted"); })["catch"](function (err) {
+            console.log(err);
+            throw err;
         });
     };
-    MongoDB.prototype.find_one = function (name) {
+    Mysql.prototype.find_one = function (name) {
         return __awaiter(this, void 0, void 0, function () {
             var search_result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, User.find({ name: name }, function (err, users) {
-                            search_result = users;
+                    case 0: return [4 /*yield*/, this.knex("user")
+                            .select("*")
+                            .where("NAME", name)
+                            .orWhere("MAIL", name)
+                            .then(function (user) {
+                            search_result = user;
                         })];
                     case 1:
                         _a.sent();
@@ -74,17 +90,25 @@ var MongoDB = /** @class */ (function () {
             });
         });
     };
-    MongoDB.prototype.find_user = function (name, password) {
+    Mysql.prototype.find_user = function (name, password) {
         return __awaiter(this, void 0, void 0, function () {
             var search_result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, User.find({ name: name, password: password }, function (err, users) {
-                            search_result = users;
-                        })];
+                    case 0:
+                        if (name === undefined || password === undefined) {
+                            return [2 /*return*/, true];
+                        }
+                        console.log(name);
+                        return [4 /*yield*/, this.knex("user")
+                                .where("NAME", name)
+                                .andWhere("PASSWORD", password)
+                                .then(function (user) {
+                                search_result = user;
+                            })];
                     case 1:
                         _a.sent();
-                        if (search_result === undefined) {
+                        if (search_result.length === 0) {
                             return [2 /*return*/, true];
                         }
                         else {
@@ -95,60 +119,6 @@ var MongoDB = /** @class */ (function () {
             });
         });
     };
-    MongoDB.prototype.paginated_results = function (model) {
-        var _this = this;
-        return function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var results, page, limit, startIndex, endIndex, _a, _b, e_1;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        results = {
-                            next: {},
-                            previous: {},
-                            results: ""
-                        };
-                        page = parseInt(req.query.page);
-                        limit = 5;
-                        startIndex = (page - 1) * limit;
-                        endIndex = page * limit;
-                        _a = endIndex;
-                        return [4 /*yield*/, model.countDocuments().exec()];
-                    case 1:
-                        if (_a < (_c.sent())) {
-                            results.next = {
-                                page: page + 1,
-                                limit: limit
-                            };
-                        }
-                        if (startIndex > 0) {
-                            results.previous = {
-                                page: page - 1,
-                                limit: limit
-                            };
-                        }
-                        _c.label = 2;
-                    case 2:
-                        _c.trys.push([2, 4, , 5]);
-                        _b = results;
-                        return [4 /*yield*/, model
-                                .find()
-                                .limit(limit)
-                                .skip(startIndex)
-                                .exec()];
-                    case 3:
-                        _b.results = _c.sent();
-                        res.paginatedResults = results;
-                        next();
-                        return [3 /*break*/, 5];
-                    case 4:
-                        e_1 = _c.sent();
-                        res.status(500).json({ message: e_1.message });
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
-                }
-            });
-        }); };
-    };
-    return MongoDB;
+    return Mysql;
 }());
-exports.MongoDB = MongoDB;
+exports.Mysql = Mysql;
