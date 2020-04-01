@@ -1,6 +1,5 @@
 import mysql = require("mysql");
 import knex = require("knex");
-import { callbackify } from "util";
 
 export class Mysql {
     knex = require("knex")({
@@ -11,7 +10,6 @@ export class Mysql {
             password: "VKYmppnmFQrZSLBbDfCk",
             database: "bi2jnwdmlse79o7fxemx"
         },
-        acquireConnectionTimeout: 3000,
         useNullAsDefault: true
     });
     constructor() {}
@@ -23,13 +21,7 @@ export class Mysql {
                 mail: email
             }
         ];
-        this.knex("USER")
-            .insert(d)
-            .then(() => console.log("data inserted"))
-            .catch(err => {
-                console.log(err);
-                throw err;
-            });
+        this.knex("USER").insert(d);
     }
     async find_one(name: string) {
         let search_result;
@@ -52,7 +44,6 @@ export class Mysql {
             return true;
         }
         let search_result;
-        console.log(name);
         await this.knex("USER")
             .where("NAME", name)
             .andWhere("PASSWORD", password)
