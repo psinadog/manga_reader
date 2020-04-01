@@ -41,10 +41,10 @@ var Mysql = /** @class */ (function () {
         this.knex = require("knex")({
             client: "mysql",
             connection: {
-                host: "localhost",
-                user: "root",
-                password: "password",
-                database: "manga_reader"
+                host: "bi2jnwdmlse79o7fxemx-mysql.services.clever-cloud.com",
+                user: "u3iyfoj9l0m1qcmx",
+                password: "VKYmppnmFQrZSLBbDfCk",
+                database: "bi2jnwdmlse79o7fxemx"
             },
             acquireConnectionTimeout: 3000,
             useNullAsDefault: true
@@ -58,7 +58,7 @@ var Mysql = /** @class */ (function () {
                 mail: email
             }
         ];
-        this.knex("user")
+        this.knex("USER")
             .insert(d)
             .then(function () { return console.log("data inserted"); })["catch"](function (err) {
             console.log(err);
@@ -70,7 +70,7 @@ var Mysql = /** @class */ (function () {
             var search_result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.knex("user")
+                    case 0: return [4 /*yield*/, this.knex("USER")
                             .select("*")
                             .where("NAME", name)
                             .orWhere("MAIL", name)
@@ -100,7 +100,7 @@ var Mysql = /** @class */ (function () {
                             return [2 /*return*/, true];
                         }
                         console.log(name);
-                        return [4 /*yield*/, this.knex("user")
+                        return [4 /*yield*/, this.knex("USER")
                                 .where("NAME", name)
                                 .andWhere("PASSWORD", password)
                                 .then(function (user) {
