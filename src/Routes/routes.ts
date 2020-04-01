@@ -1,14 +1,12 @@
 import express = require("express");
 
 import { Mail } from "./nodemail";
-import { MongoDB } from "../MongoDB/mongo";
+import { Mysql } from "../Mysql/mysql";
 import { Verify } from "./verify_user";
-import { Intermediate } from "./deps";
 
-const User = require("../MongoDB/Schema/users");
 const router = express.Router();
 
-const mongo = new MongoDB();
+const mysql = new Mysql();
 
 let cookies_data: boolean;
 let cookies_name: string;
@@ -26,9 +24,9 @@ router.use((req: express.Request, res: express.Response, next: express.NextFunct
 });
 
 router.get("/", async (req: express.Request, res: express.Response) => {
-    if (!cookies_data) res.render("index", { data: { is_login: cookies_data } });
+    const user = await mysql.find_user(cookies_name, cookies_password);
+    if (user) res.render("index", { data: { is_login: cookies_data } });
     else {
-        const user = await mongo.find_user(cookies_name, cookies_password);
         if (!user) {
             res.render("index", {
                 data: {
@@ -43,23 +41,13 @@ router.get("/", async (req: express.Request, res: express.Response) => {
     }
 });
 
-router.get("/login", (req: express.Request, res: express.Response) => {
-    if (!cookies_data) res.render("login");
-    else res.send("you're logged in already");
-});
-
-router.get("/registration", (req: express.Request, res: express.Response) => {
-    if (!cookies_data) res.render("registration");
-    else res.send("you're logged in");
-});
-
 router.post("/exit", (req: express.Request, res: express.Response) => {
     res.clearCookie("user_data");
     res.redirect("/");
 });
 
-router.post("/req-page-progress", mongo.paginated_results(User), async (req: express.Request, res: express.Response | any) => {
-    const user = await mongo.find_user(cookies_name, cookies_password);
+router.post("/req-page-progress", async (req: express.Request, res: express.Response | any) => {
+    const user = await mysql.find_user(req.body.name, req.body.password);
 
     if (!req.body) return res.sendStatus(400);
 
@@ -81,9 +69,7 @@ router.post("/registration-process", async (req: express.Request, res: express.R
 
     if (!req.body) return res.sendStatus(400);
 
-    const exist = (await mongo.find_one(req.body.name)) && (await mongo.find_one(req.body.email));
-
-    console.log(exist);
+    const exist = (await mysql.find_one(req.body.name)) && (await mysql.find_one(req.body.email));
 
     const message = {
         from: "ilyaspiypiy@gmail.com",
@@ -98,7 +84,7 @@ router.post("/registration-process", async (req: express.Request, res: express.R
 
     const mail = new Mail(message);
     mail.send();
-    mongo.save_user(req.body.name, req.body.password, req.body.email);
+    mysql.save_user(req.body.name, req.body.password, req.body.email);
     return res.json(exist);
 });
 

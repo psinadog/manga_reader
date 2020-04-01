@@ -1,12 +1,50 @@
-<link rel="stylesheet" href="/stylesheets/navbar.css">
-<link rel="shortcut icon" href="/images/icons8-admission-48.png" type="image/png">
-<div>
-    <% if(data.is_login) { %>
-    <form action="/exit" method="post">
-        <input type="submit" name="exit" value="exit" class="exit">
-    </form>
-    <% } else { %>
-    <a href="/login">login</a>
-    <a href="/registration">registration</a>
-    <% } %>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/stylesheets/navbar.css" />
+        <link rel="shortcut icon" href="/images/icons8-admission-48.png" type="image/png" />
+    </head>
+    <body>
+        <div class="invisible_menu"></div>
+        <div class="navbar">
+            <% if(data.is_login) { %>
+            <form action="/exit" method="post">
+                <input type="submit" name="exit" value="exit" class="exit" />
+            </form>
+            <% } else { %>
+            <div class="right_menu">
+                <form action="" class="form_search">
+                    <input type="text" />
+                    <input type="submit" value="🔍" />
+                </form>
+                <button class="ripple-btn login_btn">Sign in</button>
+                <button class="ripple-btn registration_btn">Sign up</button>
+            </div>
+            <div class="registration_menu hidden_menu">
+                <form name="reg-form">
+                    <input type="text" name="name" id="name_id" class="text_input" autocomplete="off" placeholder="User name" required /> <br />
+                    <input type="password" id="password_id" class="text_input" name="password" autocomplete="off" placeholder="Password" required /> <br />
+                    <input type="text" id="email_id" class="text_input" name="email" autocomplete="off" placeholder="Email Address" required /><br />
+                    <br />
+                    <input type="submit" value="regstration" class="text_input" id="submit" onclick="lockout_submit(this)" />
+                </form>
+            </div>
+            <div class="login_menu hidden_menu">
+                <form action="req-page-progress" method="post">
+                    <input type="text" name="name" class="text_input" placeholder="User name" /> <br />
+                    <input type="password" name="password" class="text_input" placeholder="Password" /> <br />
+                    <br />
+                    <input type="submit" value="login" />
+                </form>
+            </div>
+            <% } %>
+            <div class="left_menu">
+                <h1>Тип лого</h1>
+            </div>
+        </div>
+        <script src="js/registration.js"></script>
+        <script src="js/menus.js"></script>
+    </body>
+</html>
