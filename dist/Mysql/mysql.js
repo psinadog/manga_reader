@@ -46,7 +46,6 @@ var Mysql = /** @class */ (function () {
                 password: "VKYmppnmFQrZSLBbDfCk",
                 database: "bi2jnwdmlse79o7fxemx"
             },
-            acquireConnectionTimeout: 3000,
             useNullAsDefault: true
         });
     }
@@ -60,10 +59,7 @@ var Mysql = /** @class */ (function () {
         ];
         this.knex("USER")
             .insert(d)
-            .then(function () { return console.log("data inserted"); })["catch"](function (err) {
-            console.log(err);
-            throw err;
-        });
+            .then(console.log("SUCCESS"));
     };
     Mysql.prototype.find_one = function (name) {
         return __awaiter(this, void 0, void 0, function () {
@@ -99,7 +95,6 @@ var Mysql = /** @class */ (function () {
                         if (name === undefined || password === undefined) {
                             return [2 /*return*/, true];
                         }
-                        console.log(name);
                         return [4 /*yield*/, this.knex("USER")
                                 .where("NAME", name)
                                 .andWhere("PASSWORD", password)

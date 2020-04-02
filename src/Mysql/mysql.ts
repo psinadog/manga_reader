@@ -21,7 +21,9 @@ export class Mysql {
                 mail: email
             }
         ];
-        this.knex("USER").insert(d);
+        this.knex("USER")
+            .insert(d)
+            .then(console.log("SUCCESS"));
     }
     async find_one(name: string) {
         let search_result;
