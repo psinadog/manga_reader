@@ -40,47 +40,34 @@ var express = require("express");
 var nodemail_1 = require("./nodemail");
 var mysql_1 = require("../Mysql/mysql");
 var verify_user_1 = require("./verify_user");
+var verify_cookies_1 = require("./verify_cookies");
 var router = express.Router();
 var mysql = new mysql_1.Mysql();
 var cookies_data;
-var cookies_name;
-var cookies_password;
-router.use(function (req, res, next) {
-    if (req.cookies.user_data === undefined) {
-        cookies_data = false;
-    }
-    else {
-        cookies_data = true;
-        cookies_name = req.cookies.user_data[0]["name"];
-        cookies_password = req.cookies.user_data[0]["password"];
-    }
-    next();
-});
-router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
+router.use(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var v, is_admin;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, mysql.find_user(cookies_name, cookies_password)];
+            case 0:
+                v = new verify_cookies_1.Cookies(req, res);
+                cookies_data = v.verify();
+                return [4 /*yield*/, mysql.is_admin(cookies_data.cookies_privilege)];
             case 1:
-                user = _a.sent();
-                if (user)
-                    res.render("index", { data: { is_login: cookies_data } });
-                else {
-                    if (!user) {
-                        res.render("index", {
-                            data: {
-                                is_login: cookies_data,
-                                name: cookies_name,
-                                password: cookies_password
-                            }
-                        });
-                    }
-                    else {
-                        res.clearCookie("user_data");
-                    }
+                is_admin = _a.sent();
+                if (!(!is_admin || cookies_data.cookies_privilege === "admin")) {
+                    cookies_data.cookies_privilege === null;
                 }
+                next();
                 return [2 /*return*/];
         }
+    });
+}); });
+router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        res.render("index", {
+            cookies_data: cookies_data
+        });
+        return [2 /*return*/];
     });
 }); });
 router.post("/exit", function (req, res) {
@@ -88,7 +75,7 @@ router.post("/exit", function (req, res) {
     res.redirect("/");
 });
 router.post("/req-page-progress", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
+    var user, user_value;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, mysql.find_user(req.body.name, req.body.password)];
@@ -96,14 +83,17 @@ router.post("/req-page-progress", function (req, res) { return __awaiter(void 0,
                 user = _a.sent();
                 if (!req.body)
                     return [2 /*return*/, res.sendStatus(400)];
-                if (!user) {
-                    res.cookie("user_data", user);
-                    res.redirect("/");
-                }
-                else {
-                    res.json(false);
-                }
-                return [2 /*return*/];
+                if (!!user) return [3 /*break*/, 3];
+                return [4 /*yield*/, mysql.find_user_val(req.body.name, req.body.password)];
+            case 2:
+                user_value = _a.sent();
+                res.cookie("user_data", { cookies_have: user, cookies_name: user_value[0].NAME, cookies_password: user_value[0].PASSWORD, cookies_mail: user_value[0].MAIL, cookies_privilege: user_value[0].PRIVILEGE });
+                res.redirect("/");
+                return [3 /*break*/, 4];
+            case 3:
+                res.json(false);
+                _a.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }); });

@@ -3,42 +3,31 @@ import express = require("express");
 import { Mail } from "./nodemail";
 import { Mysql } from "../Mysql/mysql";
 import { Verify } from "./verify_user";
+import { Cookies } from "./verify_cookies";
 
 const router = express.Router();
 
 const mysql = new Mysql();
 
-let cookies_data: boolean;
-let cookies_name: string;
-let cookies_password: string;
+let cookies_data;
 
-router.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (req.cookies.user_data === undefined) {
-        cookies_data = false;
-    } else {
-        cookies_data = true;
-        cookies_name = req.cookies.user_data[0]["name"];
-        cookies_password = req.cookies.user_data[0]["password"];
+router.use(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    /**
+     * корочееее
+     */
+    const v = new Cookies(req, res);
+    cookies_data = v.verify();
+    const is_admin = await mysql.is_admin(cookies_data.cookies_privilege);
+    if (!(!is_admin || cookies_data.cookies_privilege === "admin")) {
+        cookies_data.cookies_privilege === null;
     }
     next();
 });
 
 router.get("/", async (req: express.Request, res: express.Response) => {
-    const user = await mysql.find_user(cookies_name, cookies_password);
-    if (user) res.render("index", { data: { is_login: cookies_data } });
-    else {
-        if (!user) {
-            res.render("index", {
-                data: {
-                    is_login: cookies_data,
-                    name: cookies_name,
-                    password: cookies_password
-                }
-            });
-        } else {
-            res.clearCookie("user_data");
-        }
-    }
+    res.render("index", {
+        cookies_data
+    });
 });
 
 router.post("/exit", (req: express.Request, res: express.Response) => {
@@ -46,13 +35,14 @@ router.post("/exit", (req: express.Request, res: express.Response) => {
     res.redirect("/");
 });
 
-router.post("/req-page-progress", async (req: express.Request, res: express.Response | any) => {
+router.post("/req-page-progress", async (req: express.Request, res: express.Response) => {
     const user = await mysql.find_user(req.body.name, req.body.password);
 
     if (!req.body) return res.sendStatus(400);
 
     if (!user) {
-        res.cookie("user_data", user);
+        const user_value = await mysql.find_user_val(req.body.name, req.body.password);
+        res.cookie("user_data", { cookies_have: user, cookies_name: user_value[0].NAME, cookies_password: user_value[0].PASSWORD, cookies_mail: user_value[0].MAIL, cookies_privilege: user_value[0].PRIVILEGE });
         res.redirect("/");
     } else {
         res.json(false);

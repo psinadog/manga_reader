@@ -37,22 +37,79 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
+var mysql = require("mysql");
+var promise = require("bluebird");
+var verify_cookies_1 = require("./verify_cookies");
 var router = express.Router();
+var connection = mysql.createConnection({
+    host: "bi2jnwdmlse79o7fxemx-mysql.services.clever-cloud.com",
+    user: "u3iyfoj9l0m1qcmx",
+    password: "VKYmppnmFQrZSLBbDfCk",
+    database: "bi2jnwdmlse79o7fxemx"
+});
+var queryAsync = promise.promisify(connection.query.bind(connection));
+connection.connect();
+process.stdin.resume();
+process.on("exit", exitHandler.bind(null, { shutdownDb: true }));
 var cookies_data;
-var cookies_name;
-var cookies_password;
 router.use(function (req, res, next) {
-    if (req.cookies.user_data === undefined) {
-        cookies_data = false;
-    }
-    else {
-        cookies_data = true;
-        cookies_name = req.cookies.user_data[0]["name"];
-        cookies_password = req.cookies.user_data[0]["password"];
-    }
+    var v = new verify_cookies_1.Cookies(req, res);
+    cookies_data = v.verify();
     next();
 });
-router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-    return [2 /*return*/];
-}); }); });
+router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        res.render("content", { cookies_data: cookies_data });
+        return [2 /*return*/];
+    });
+}); });
+router.post("/", function (req, res) {
+    var numRows;
+    var queryPagination;
+    var numPerPage = parseInt(req.query.npp, 10) || 1;
+    var page = parseInt(req.query.page, 10) || 0;
+    var numPages;
+    var skip = page * numPerPage;
+    // Here we compute the LIMIT parameter for MySQL query
+    var limit = skip + "," + numPerPage;
+    queryAsync("SELECT count(*) as numRows FROM USER")
+        .then(function (results) {
+        numRows = results[0].numRows;
+        numPages = Math.ceil(numRows / numPerPage);
+        console.log("number of pages:", numPages);
+    })
+        .then(function () { return queryAsync("SELECT * FROM USER ORDER BY ID DESC LIMIT " + limit); })
+        .then(function (results) {
+        var responsePayload = {
+            results: results,
+            pagination: {}
+        };
+        if (page < numPages) {
+            responsePayload.pagination = {
+                current: page,
+                perPage: numPerPage,
+                previous: page > 0 ? page - 1 : undefined,
+                next: page < numPages - 1 ? page + 1 : undefined
+            };
+        }
+        else
+            responsePayload.pagination = {
+                err: "queried page " + page + " is >= to maximum page number " + numPages
+            };
+        res.json(responsePayload);
+    })["catch"](function (err) {
+        console.error(err);
+        res.json({ err: err });
+    });
+});
+function exitHandler(options, err) {
+    if (options.shutdownDb) {
+        console.log("shutdown mysql connection");
+        connection.end();
+    }
+    if (err)
+        console.log(err.stack);
+    if (options.exit)
+        process.exit();
+}
 exports["default"] = router;

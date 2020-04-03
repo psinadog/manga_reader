@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var Mysql = /** @class */ (function () {
     function Mysql() {
+        this.DIR = "./uploads";
         this.knex = require("knex")({
             client: "mysql",
             connection: {
@@ -104,6 +105,52 @@ var Mysql = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         if (search_result.length === 0) {
+                            return [2 /*return*/, true];
+                        }
+                        else {
+                            return [2 /*return*/, false];
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Mysql.prototype.find_user_val = function (name, password) {
+        return __awaiter(this, void 0, void 0, function () {
+            var search_result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.knex("USER")
+                            .where("NAME", name)
+                            .andWhere("PASSWORD", password)
+                            .then(function (user) {
+                            search_result = user;
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, search_result];
+                }
+            });
+        });
+    };
+    Mysql.prototype.is_admin = function (privilege) {
+        return __awaiter(this, void 0, void 0, function () {
+            var search_result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (privilege === undefined) {
+                            return [2 /*return*/, true];
+                        }
+                        return [4 /*yield*/, this.knex("USER")
+                                .where("PRIVILEGE", privilege)
+                                .then(function (user) {
+                                search_result = user;
+                            })];
+                    case 1:
+                        _a.sent();
+                        console.log(search_result[0].PRIVILEGE);
+                        if (search_result[0].PRIVILEGE === null) {
                             return [2 /*return*/, true];
                         }
                         else {

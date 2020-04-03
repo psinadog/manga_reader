@@ -4,18 +4,18 @@ import cookie = require("cookie-parser");
 import engine = require("ejs-mate");
 
 import routes from "./Routes/routes";
-// import users from "./Routes/users";
+import users from "./Routes/users";
 
 const app = express();
 const PORT = process.env.PORT || 80;
 
 app.engine("ejs", engine);
 app.use(cookie());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/../public"));
 app.use("/", routes);
-// app.use("/users", users);
+app.use("/users", users);
 
 app.set("view engine", "ejs");
 

@@ -3,20 +3,30 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Abel&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="stylesheets/main.css" />
         <link rel="stylesheet" href="/stylesheets/navbar.css" />
         <link rel="shortcut icon" href="/images/icons8-admission-48.png" type="image/png" />
+        <link rel="stylesheet" href="/stylesheets/ripple_btn.css" />
     </head>
     <body>
         <div class="invisible_menu"></div>
         <div class="navbar">
-            <% if(data.is_login) { %>
-            <form action="/exit" method="post">
-                <input type="submit" name="exit" value="exit" class="exit" />
-            </form>
+            <% if(cookies_data.cookies_have) { %>
+            <div class="profile">
+                <% if(cookies_data.cookies_privilege) {%>
+                <form action="/users" method="post">
+                    <input type="submit" />
+                </form>
+                <% } %>
+                <form action="/exit" method="post">
+                    <input type="submit" name="exit" value="exit" class="exit" />
+                </form>
+            </div>
             <% } else { %>
             <div class="right_menu">
                 <form action="" class="form_search">
-                    <input type="text" />
+                    <input type="text" class="text_search" />
                     <input type="submit" value="🔍" />
                 </form>
                 <button class="ripple-btn login_btn">Sign in</button>
@@ -41,10 +51,11 @@
             </div>
             <% } %>
             <div class="left_menu">
-                <h1>Тип лого</h1>
+                <h1>Tipa logo</h1>
             </div>
         </div>
         <script src="js/registration.js"></script>
         <script src="js/menus.js"></script>
+        <script src="/js/ripple.js"></script>
     </body>
 </html>

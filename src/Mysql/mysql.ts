@@ -1,7 +1,10 @@
 import mysql = require("mysql");
 import knex = require("knex");
+import multer = require("multer");
+import path = require("path");
 
 export class Mysql {
+    DIR = "./uploads";
     knex = require("knex")({
         client: "mysql",
         connection: {
@@ -12,6 +15,7 @@ export class Mysql {
         },
         useNullAsDefault: true
     });
+
     constructor() {}
     save_user(name: string, password: string, email: string) {
         const d = [
@@ -54,6 +58,34 @@ export class Mysql {
             });
 
         if (search_result.length === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    async find_user_val(name: string, password: string) {
+        let search_result;
+        await this.knex("USER")
+            .where("NAME", name)
+            .andWhere("PASSWORD", password)
+            .then(user => {
+                search_result = user;
+            });
+        return search_result;
+    }
+    async is_admin(privilege: string) {
+        if (privilege === undefined) {
+            return true;
+        }
+        let search_result;
+        await this.knex("USER")
+            .where("PRIVILEGE", privilege)
+            .then(user => {
+                search_result = user;
+            });
+
+        console.log(search_result[0].PRIVILEGE);
+        if (search_result[0].PRIVILEGE === null) {
             return true;
         } else {
             return false;
