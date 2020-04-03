@@ -29,6 +29,15 @@ export class Mysql {
             .insert(d)
             .then(console.log("SUCCESS"));
     }
+    async find_all() {
+        let search_result;
+        await this.knex("USER")
+            .select("*")
+            .then(result => {
+                search_result = result;
+            });
+        return search_result;
+    }
     async find_one(name: string) {
         let search_result;
         await this.knex("USER")
@@ -90,5 +99,17 @@ export class Mysql {
         } else {
             return false;
         }
+    }
+    async delete_one(ID: number) {
+        await this.knex("USER")
+            .select("*")
+            .where("ID", ID)
+            .del();
+    }
+    async make_admin(ID: number) {
+        await this.knex("USER")
+            .select("*")
+            .where("ID", ID)
+            .update({ PRIVILEGE: "vip" });
     }
 }
