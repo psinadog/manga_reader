@@ -11,9 +11,9 @@ export class Mysql {
             host: "bi2jnwdmlse79o7fxemx-mysql.services.clever-cloud.com",
             user: "u3iyfoj9l0m1qcmx",
             password: "VKYmppnmFQrZSLBbDfCk",
-            database: "bi2jnwdmlse79o7fxemx"
+            database: "bi2jnwdmlse79o7fxemx",
         },
-        useNullAsDefault: true
+        useNullAsDefault: true,
     });
 
     constructor() {}
@@ -22,18 +22,16 @@ export class Mysql {
             {
                 name: name,
                 password: password,
-                mail: email
-            }
+                mail: email,
+            },
         ];
-        this.knex("USER")
-            .insert(d)
-            .then(console.log("SUCCESS"));
+        this.knex("USER").insert(d).then(console.log("SUCCESS"));
     }
     async find_all() {
         let search_result;
         await this.knex("USER")
             .select("*")
-            .then(result => {
+            .then((result) => {
                 search_result = result;
             });
         return search_result;
@@ -44,7 +42,7 @@ export class Mysql {
             .select("*")
             .where("NAME", name)
             .orWhere("MAIL", name)
-            .then(user => {
+            .then((user) => {
                 search_result = user;
             });
 
@@ -62,7 +60,7 @@ export class Mysql {
         await this.knex("USER")
             .where("NAME", name)
             .andWhere("PASSWORD", password)
-            .then(user => {
+            .then((user) => {
                 search_result = user;
             });
 
@@ -77,7 +75,7 @@ export class Mysql {
         await this.knex("USER")
             .where("NAME", name)
             .andWhere("PASSWORD", password)
-            .then(user => {
+            .then((user) => {
                 search_result = user;
             });
         return search_result;
@@ -89,27 +87,21 @@ export class Mysql {
         let search_result;
         await this.knex("USER")
             .where("PRIVILEGE", privilege)
-            .then(user => {
+            .then((user) => {
                 search_result = user;
             });
 
         console.log(search_result[0].PRIVILEGE);
-        if (search_result[0].PRIVILEGE === null) {
+        if (search_result[0].PRIVILEGE !== "admin") {
             return true;
         } else {
             return false;
         }
     }
     async delete_one(ID: number) {
-        await this.knex("USER")
-            .select("*")
-            .where("ID", ID)
-            .del();
+        await this.knex("USER").select("*").where("ID", ID).del();
     }
     async make_admin(ID: number) {
-        await this.knex("USER")
-            .select("*")
-            .where("ID", ID)
-            .update({ PRIVILEGE: "vip" });
+        await this.knex("USER").select("*").where("ID", ID).update({ PRIVILEGE: "vip" });
     }
 }

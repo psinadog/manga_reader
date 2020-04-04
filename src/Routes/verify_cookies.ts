@@ -15,6 +15,8 @@ export class Cookies {
         let cookies_name: string;
         let cookies_password: string;
         let cookies_privilege: string;
+        const is_admin = this.mysql.is_admin(cookies_privilege);
+
         if (this.req.cookies.user_data === undefined) {
             cookies_have = false;
         } else {
@@ -22,12 +24,15 @@ export class Cookies {
             cookies_name = this.req.cookies.user_data["cookies_name"];
             cookies_password = this.req.cookies.user_data["cookies_password"];
             cookies_privilege = this.req.cookies.user_data["cookies_privilege"];
+            if (!(!is_admin || cookies_privilege === "admin")) {
+                cookies_privilege === null;
+            }
         }
         return {
             cookies_have: cookies_have,
             cookies_name: cookies_name,
             cookies_password: cookies_password,
-            cookies_privilege: cookies_privilege
+            cookies_privilege: cookies_privilege,
         };
     }
 }

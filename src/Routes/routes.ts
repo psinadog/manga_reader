@@ -12,15 +12,7 @@ const mysql = new Mysql();
 let cookies_data;
 
 router.use(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    /**
-     * корочееее
-     */
-    const v = new Cookies(req, res);
-    cookies_data = v.verify();
-    const is_admin = await mysql.is_admin(cookies_data.cookies_privilege);
-    if (!(!is_admin || cookies_data.cookies_privilege === "admin")) {
-        cookies_data.cookies_privilege === null;
-    }
+    cookies_data = new Cookies(req, res).verify();
     next();
 });
 
@@ -43,7 +35,7 @@ router.post("/req-page-progress", async (req: express.Request, res: express.Resp
     if (!user) {
         const user_value = await mysql.find_user_val(req.body.name, req.body.password);
         res.cookie("user_data", { cookies_have: user, cookies_name: user_value[0].NAME, cookies_password: user_value[0].PASSWORD, cookies_mail: user_value[0].MAIL, cookies_privilege: user_value[0].PRIVILEGE });
-        res.redirect("/");
+        res.json(true);
     } else {
         res.json(false);
     }
@@ -54,7 +46,6 @@ router.post("/registration-process", async (req: express.Request, res: express.R
     const verify = new_user.verify() && new_user.is_empty();
 
     if (!verify) {
-        console.log("WRONG");
         return res.json(!verify);
     }
 
@@ -70,7 +61,6 @@ router.post("/registration-process", async (req: express.Request, res: express.R
     };
 
     if (!exist) {
-        console.log("EXISTS");
         return res.json(!exist);
     }
 

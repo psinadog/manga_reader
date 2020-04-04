@@ -46,8 +46,10 @@
             <p><%= JSON.stringify(users[i]) %></p>
             <form action="/users/modify" method="post">
                 <input type="text" name="user" class="USER" value="<%= users[i].ID %>" />
+                <% if(users[i].PRIVILEGE !== "admin") { %>
                 <input type="submit" name="make_D" value="DELETE" />
                 <input type="submit" name="make_A" value="MAKE ADMIN" />
+                <% } %>
             </form>
         </div>
         <% } %>
