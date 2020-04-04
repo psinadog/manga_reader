@@ -3,8 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://fonts.googleapis.com/css?family=Abel&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="stylesheets/main.css" />
+        <link rel="stylesheet" href="/stylesheets/main.css" />
         <link rel="stylesheet" href="/stylesheets/navbar.css" />
         <link rel="shortcut icon" href="/images/icons8-admission-48.png" type="image/png" />
         <link rel="stylesheet" href="/stylesheets/ripple_btn.css" />
@@ -24,14 +23,13 @@
                 </form>
             </div>
             <% } else { %>
-            <div class="right_menu">
-                <form action="" class="form_search">
-                    <input type="text" class="text_search" />
-                    <input type="submit" value="🔍" />
-                </form>
-                <button class="ripple-btn login_btn">Sign in</button>
-                <button class="ripple-btn registration_btn">Sign up</button>
+            <div class="sign_menu">
+                <div class="items">
+                    <button class="ripple-btn login_btn z">Sign in</button>
+                    <button class="ripple-btn registration_btn z">Sign up</button>
+                </div>
             </div>
+            <button class="ripple-btn slide_btn"></button>
             <div class="registration_menu hidden_menu">
                 <form name="reg-form">
                     <input type="text" name="name" id="name_id" class="text_input" autocomplete="off" placeholder="User name" required /> <br />
@@ -42,20 +40,19 @@
                 </form>
             </div>
             <div class="login_menu hidden_menu">
-                <form action="req-page-progress" method="post">
+                <form name="log-form">
+                    <h1 class="error_sign_in" style="display: none; font-size: 20px; letter-spacing: 4px; padding: 10px; color: red; text-shadow: 0 0 2px #ffffff, 0 0 1.5px #854535, 0 0 1.5px #5c150c;">User name or password are wrong</h1>
                     <input type="text" name="name" class="text_input" placeholder="User name" /> <br />
                     <input type="password" name="password" class="text_input" placeholder="Password" /> <br />
                     <br />
-                    <input type="submit" value="login" />
+                    <input type="submit" value="login" id="sign_in_submit" onclick="lockout_submit(this)" />
                 </form>
             </div>
+            <!-- action="req-page-progress" method="post" -->
             <% } %>
-            <div class="left_menu">
-                <h1>Tipa logo</h1>
-            </div>
         </div>
-        <script src="js/registration.js"></script>
-        <script src="js/menus.js"></script>
+        <script src="/js/registration.js"></script>
+        <script src="/js/menus.js"></script>
         <script src="/js/ripple.js"></script>
     </body>
 </html>

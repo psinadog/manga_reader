@@ -26,7 +26,7 @@ router.use(async (req: express.Request, res: express.Response, next: express.Nex
 
 router.get("/", async (req: express.Request, res: express.Response) => {
     res.render("index", {
-        cookies_data
+        cookies_data,
     });
 });
 
@@ -54,7 +54,8 @@ router.post("/registration-process", async (req: express.Request, res: express.R
     const verify = new_user.verify() && new_user.is_empty();
 
     if (!verify) {
-        return res.json(verify);
+        console.log("WRONG");
+        return res.json(!verify);
     }
 
     if (!req.body) return res.sendStatus(400);
@@ -65,17 +66,18 @@ router.post("/registration-process", async (req: express.Request, res: express.R
         from: "ilyaspiypiy@gmail.com",
         to: req.body.email,
         subject: "Test",
-        text: "работает"
+        text: "работает",
     };
 
     if (!exist) {
-        return res.json(exist);
+        console.log("EXISTS");
+        return res.json(!exist);
     }
 
     const mail = new Mail(message);
     mail.send();
     mysql.save_user(req.body.name, req.body.password, req.body.email);
-    return res.json(exist);
+    return res.json(!exist);
 });
 
 export default router;

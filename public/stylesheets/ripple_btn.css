@@ -1,40 +1,33 @@
 @keyframes ripple {
     to {
-        transform: scale(1.4);
+        transform: scale(20);
         opacity: 0;
     }
 }
 
 .ripple-btn {
-    float: right;
-    border: 1px solid rgb(255, 255, 255, 0.3);
-    overflow: hidden;
-    width: 100px;
-    height: 40px;
     outline: 0;
     cursor: pointer;
-    position: relative;
-    top: -20px;
     background-color: transparent;
     color: rgba(255, 255, 255, 0.7);
+    transition: 0.2s;
+    border: 0;
+    font-size: 39px;
 }
+
 .ripple-btn:hover {
+    filter: brightness(50%);
     background-color: rgb(255, 255, 255, 0.3);
     color: rgba(255, 255, 255);
 }
 
 .ripple-btn .ripple {
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.7);
-    position: absolute;
-    transform: scale(0);
-    animation: ripple 0.1s linear;
-}
-
-.ripple-btn .ripple {
     border-radius: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
+    border: 5px solid rgb(66, 54, 134);
     position: absolute;
     transform: scale(0);
-    animation: ripple 0.3s linear;
+    padding: 20px;
+    background-color: transparent;
+    z-index: -1000;
+    animation: ripple 0.4s linear;
 }
