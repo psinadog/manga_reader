@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            * {
+                padding: 4px;
+                margin: 5px;
+                color: white;
+            }
+            body {
+                background-color: black;
+            }
+            input {
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <form action="/a/upload" method="post">
+            <!-- любая директория -->
+            <input type="text" value="" />
+            <input type="text" name="name" placeholder="MANGA NAME" /> <br />
+            <input type="text" name="desc" placeholder="DESCRIPTION" /> <br />
+            <label for="preview">Preview</label>
+            <input type="file" name="preview" /><br />
+            <label for="paths">Files</label>
+            <input type="file" name="paths" multiple /> <br />
+            <input type="submit" />
+        </form>
+        <script>
+            const _getAllFilesFromFolder = function (dir) {
+                let filesystem = require("fs");
+                let results = [];
+
+                filesystem.readdirSync(dir).forEach(function (file) {
+                    file = dir + "/" + file;
+                    var stat = filesystem.statSync(file);
+
+                    if (stat && stat.isDirectory()) {
+                        results = results.concat(_getAllFilesFromFolder(file));
+                    } else results.push(file);
+                });
+
+                return results;
+            };
+        </script>
+    </body>
+</html>

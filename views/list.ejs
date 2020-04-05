@@ -1,0 +1,37 @@
+<body>
+    <style>
+        .main_row {
+            display: flex;
+            padding: 20px;
+        }
+        img {
+            width: 300px;
+            margin-bottom: 10px;
+        }
+        .elemant div {
+            width: 300px;
+            text-align: center;
+            padding: 10px;
+            padding-bottom: 20px;
+            background-color: rgba(70, 70, 70, 0.5);
+            border: 1px solid rgba(70, 70, 70, 0.9);
+            font-size: 25px;
+            margin-right: 10px;
+            float: right;
+        }
+    </style>
+
+    <%- include("navbar") -%>
+    <div class="main_row">
+        <% for(let i = 0; i < list.length; i++) { %> <% let path = "https://res.cloudinary.com/picturesapplecustard/image/upload/v1586026604/" + list[i].MANGA_NAME + "/view/1.jpg" %>
+        <div class="elemant">
+            <a href="/v/<%=list[i].MANGA_NAME %>">
+                <div>
+                    <img src="<%= path %>" alt="" /> <br />
+                    <%=list[i].MANGA_NAME %>
+                </div>
+            </a>
+        </div>
+        <% } %>
+    </div>
+</body>

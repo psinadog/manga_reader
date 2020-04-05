@@ -1,0 +1,15 @@
+<body>
+    <%- include("navbar") -%>
+    <div class="main_row">
+        <% for(let i = 0; i < 5; i++) { %> <% let path = "https://res.cloudinary.com/picturesapplecustard/image/upload/v1586026604/" + manga[0].MANGA_NAME + "/view/" + (i + 1) + ".jpg" %>
+        <div class="elemant">
+            <a href="/v/<%=manga[0].MANGA_NAME %>">
+                <div>
+                    <img src="<%= path %>" alt="" /> <br />
+                    <%=manga[0].MANGA_NAME %>
+                </div>
+            </a>
+        </div>
+        <% } %>
+    </div>
+</body>

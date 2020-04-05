@@ -14,8 +14,11 @@
             <% if(cookies_data.cookies_have) { %>
             <div class="profile">
                 <% if(cookies_data.cookies_privilege) {%>
-                <form action="/users" method="post">
+                <form action="/m/" method="post">
                     <input type="submit" value="USER LIST" />
+                </form>
+                <form action="/a/" method="get">
+                    <input type="submit" value="ADD CONTENT" />
                 </form>
                 <% } %>
                 <form action="/exit" method="post">

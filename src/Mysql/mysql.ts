@@ -104,4 +104,40 @@ export class Mysql {
     async make_admin(ID: number) {
         await this.knex("USER").select("*").where("ID", ID).update({ PRIVILEGE: "vip" });
     }
+    async save_manga(name: string, preview: string, desc: string, length: number) {
+        const M = [
+            {
+                MANGA_NAME: name,
+                PREVIEW_DIR: preview,
+            },
+        ];
+        const D = [
+            {
+                DESCRIPTION: desc,
+                PAGE_QUANTITY: length,
+            },
+        ];
+        this.knex("MANGA").insert(M).then(console.log("added manga"));
+        this.knex("MANGA_DETAIL").insert(D).then(console.log("added details"));
+    }
+    async find_manga_one(name: string) {
+        let search_result;
+        await this.knex("MANGA")
+            .select("*")
+            .where("MANGA_NAME", name)
+            .then((user) => {
+                search_result = user;
+            });
+        return search_result;
+    }
+    async get_pages() {}
+    async find_manga_all() {
+        let search_result;
+        await this.knex("MANGA")
+            .select("*")
+            .then((result) => {
+                search_result = result;
+            });
+        return search_result;
+    }
 }
