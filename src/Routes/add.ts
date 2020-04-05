@@ -1,6 +1,7 @@
 import express = require("express");
 import multer = require("multer");
 import path = require("path");
+import Datauri = require("datauri");
 
 import { Mysql } from "../Mysql/mysql";
 import { Cookies } from "./verify_cookies";
@@ -8,6 +9,7 @@ import { Cookies } from "./verify_cookies";
 const router = express.Router();
 const mysql = new Mysql();
 const cloudinary = require("cloudinary");
+const dUri = new Datauri();
 
 cloudinary.config({
     cloud_name: "picturesapplecustard",
@@ -15,11 +17,7 @@ cloudinary.config({
     api_secret: "TkE7-xyZCqx3HDEbhPI7uK5MzvE",
 });
 const fs = require("fs");
-const storage = multer.diskStorage({
-    filename: function (req, file, callback) {
-        callback(null, file.fieldname + "-" + Date.now());
-    },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
@@ -36,8 +34,26 @@ router.get("/", (req: express.Request, res: express.Response, next: express.Next
     res.render("upload");
 });
 
-router.post("/upload", upload.single("image"), async (req: any, res) => {
-    res.send(req.file);
+router.post("/upload", upload.array("image", 100), async (req: any, res) => {
+    let dataUri;
+    console.log(req.body.name);
+    const files = req.files;
+    for (let i = 0; i < files.length; i++) {
+        dataUri = (req) => dUri.format(path.extname(req.files[i].originalname).toString(), req.files[i].buffer);
+        await cloudinary.v2.uploader.upload(dataUri(req).content, { public_id: req.body.name + "/" + "view" + "/" + (i + 1) }, (error) => {
+            if (error) {
+                console.log(error);
+            }
+        });
+    }
+    mysql.save_manga(req.body.name, "1", req.body.desc, req.files.length);
+    // if (files) {
+    //     files.forEach( (file) =>{
+    //         cloudinary.uploader.upload(file,  (result) {
+    //             console.log(result);
+    //         });
+    //     });
+    // }
     // let filePaths = req.body.paths;
 
     // let multipleUpload = new Promise(async (resolve, reject) => {

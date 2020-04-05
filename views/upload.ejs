@@ -20,7 +20,9 @@
     </head>
     <body>
         <form action="/a/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="image" />
+            <input type="text" name="name" placeholder="MANGA NAME" /> <br />
+            <input type="text" name="desc" placeholder="DESCRIPTION" /> <br />
+            <input type="file" name="image" multiple />
             <input type="submit" />
             <!-- <input type="text" value="" />
             <input type="text" name="name" placeholder="MANGA NAME" /> <br />
