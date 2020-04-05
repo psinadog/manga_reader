@@ -37,7 +37,7 @@ router.get("/", (req: express.Request, res: express.Response, next: express.Next
 });
 
 router.post("/upload", upload.single("image"), async (req: any, res) => {
-    console.log(req.file);
+    res.send(req.file);
     // let filePaths = req.body.paths;
 
     // let multipleUpload = new Promise(async (resolve, reject) => {
